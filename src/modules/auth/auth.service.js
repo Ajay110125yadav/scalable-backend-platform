@@ -5,7 +5,6 @@ import { generateToken } from "../../utils/token.js";
 export const signupService = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
 
-  // ✅ FIX 1
   if (existingUser) {
     const err = new Error("User already exists");
     err.statusCode = 409;
@@ -33,7 +32,7 @@ export const loginService = async ({ email, password }) => {
     throw err;
   }
 
-  // ✅ FIX 2
+  
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {

@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.use("/api/v1/auth", authRoutes);
 
-// ❗ hamesha sabse last
+
 app.use(errorHandler);
 
 export default app;
