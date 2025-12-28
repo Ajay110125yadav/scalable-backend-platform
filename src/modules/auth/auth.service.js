@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
 import User from "../../models/user.model.js";
-import { generateToken } from "../../utils/token.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../utils/token.js";
 
 export const signupService = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
-
   if (existingUser) {
-    const err = new Error("User already exists");
-    err.statusCode = 409;
-    throw err;
+    throw new Error("User already exists");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,28 +19,37 @@ export const signupService = async ({ name, email, password }) => {
     password: hashedPassword,
   });
 
-  const token = generateToken({ id: user._id, role: user.role });
-  return { token };
+  return {
+    id: user._id,
+    email: user.email,
+  };
 };
 
 export const loginService = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select(
+    "+password +refreshToken"
+  );
 
   if (!user) {
-    const err = new Error("Invalid credentials");
-    err.statusCode = 401;
-    throw err;
+    throw new Error("Invalid credentials");
   }
 
-  
   const isMatch = await bcrypt.compare(password, user.password);
-
   if (!isMatch) {
-    const err = new Error("Invalid credentials");
-    err.statusCode = 401;
-    throw err;
+    throw new Error("Invalid credentials");
   }
 
-  const token = generateToken({ id: user._id, role: user.role });
-  return { token };
+  const accessToken = generateAccessToken({
+    id: user._id,
+    role: user.role,
+  });
+
+  const refreshToken = generateRefreshToken({
+    id: user._id,
+  });
+
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  return { accessToken, refreshToken };
 };

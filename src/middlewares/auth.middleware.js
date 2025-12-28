@@ -1,11 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 
-export const protect = async (req, res, next) => { 
+export const protect = async (req, res, next) => {
   let token;
 
   if (
-    req.headers &&
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
@@ -13,10 +12,7 @@ export const protect = async (req, res, next) => {
   }
 
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "Not authorized, token missing",
-    });
+    return res.status(401).json({ message: "Token missing" });
   }
 
   try {
@@ -26,9 +22,6 @@ export const protect = async (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(401).json({
-      success: false,
-      message: "Not authorized, invalid token",
-    });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
