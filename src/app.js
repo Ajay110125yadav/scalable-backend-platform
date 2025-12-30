@@ -1,4 +1,5 @@
 import express from "express";
+
 import authRoutes from "./modules/auth/auth.routes.js"
 import { errorHandler } from "./middlewares/error.middleware.js";
 import userRoutes from "./modules/user/user.routes.js";
@@ -13,6 +14,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/v1/products", productRoutes);
 
 
 app.use(errorHandler);
