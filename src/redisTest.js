@@ -1,16 +1,14 @@
-import "dotenv/config";
-import redis from "./config/redis.js";
+import Redis from "ioredis";
 
-async function test() {
-  try {
-    await redis.set("ping", "pong");
-    const value = await redis.get("ping");
-    console.log("✅ Redis working:", value);
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Redis test failed:", err.message);
-    process.exit(1);
-  }
-}
+const redis = new Redis(process.env.REDIS_URL, {
+  tls: {},              // 🔥 REQUIRED for Upstash
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  family: 4,            // 🔥 force IPv4 (no ::1)
+});
 
-test();
+redis.on("connect", () => console.log("✅ Redis connected"));
+redis.on("ready", () => console.log("🚀 Redis ready"));
+redis.on("error", (err) => console.error("❌ Redis error:", err.message));
+
+export default redis;

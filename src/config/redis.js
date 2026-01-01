@@ -1,17 +1,11 @@
-import Redis from "ioredis";
+console.log("🔥 REDIS CONFIG FILE LOADED");
+console.log("🔥 REDIS_URL =", process.env.REDIS_URL);
 
-const redis = new Redis(process.env.REDIS_URL);
+if (!process.env.REDIS_URL) {
+  throw new Error("❌ REDIS_URL is undefined – dotenv not loaded first");
+}
 
-redis.on("connect", () => {
-  console.log("✅ Redis connected");
-});
-
-redis.on("ready", () => {
-  console.log("🚀 Redis ready");
-});
-
-redis.on("error", (err) => {
-  console.error("❌ Redis error:", err.message);
-});
-
-export default redis;
+export default {
+  url: process.env.REDIS_URL,
+  tls: {},
+};
