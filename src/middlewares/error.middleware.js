@@ -1,8 +1,23 @@
 export const errorHandler = (err, req, res, next) => {
-  console.error("💥 Error:", err.message);
+  console.log("🔥 ERROR CAUGHT:", err);
 
-  res.status(err.statusCode || 500).json({
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal Server Error";
+
+  if (err.code === 11000) {
+    statusCode = 400;
+    message = "Email already exists";
+  }
+
+  if (err.name === "ValidationError") {
+    statusCode = 400;
+    message = Object.values(err.errors)
+      .map(e => e.message)
+      .join(", ");
+  }
+
+  res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message,
   });
 };
